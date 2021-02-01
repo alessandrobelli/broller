@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>BRoller</title>
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="tailwind.css">
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
+  <script type="text/javascript" src="render.js"></script>
+  <style>
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .loading-overlay.is-full-page {
+      position: fixed;
+    }
+
+    .loading-overlay.is-active {
+      display: flex;
+    }
+
+    .loading-overlay {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      align-items: center;
+      display: none;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 999;
+    }
+
+    .loading-overlay .loading-background {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: rgba(0, 0, 0, .5);
+    }
+
+    .loading-overlay .loading-icon {
+
+      position: relative;
+
+    }
+
+    .loading-overlay.is-full-page .loading-icon::after {
+
+      top: calc(50% - 2.5em);
+      left: calc(50% - 2.5em);
+      width: 5em;
+      height: 5em;
+
+    }
+
+    .loading-overlay .loading-icon::after {
+
+      animation: spinAround .5s infinite linear;
+      border: 2px solid #dbdbdb;
+      border-top-color: rgb(219, 219, 219);
+      border-top-width: 2px;
+      border-right-color: rgb(219, 219, 219);
+      border-right-width: 2px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+      border-radius: 290486px;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      content: "";
+      display: block;
+      height: 1em;
+      position: relative;
+      width: 1em;
+      position: absolute;
+      top: calc(50% - 1.5em);
+      left: calc(50% - 1.5em);
+      width: 3em;
+      height: 3em;
+      border-width: .25em;
+
+    }
+
+    @keyframes spinAround {
+      from {
+        transform: rotate(0)
+      }
+
+      to {
+        transform: rotate(359deg)
+      }
+    }
+  </style>
+</head>
+
+<body class="w-full h-full font-serif subpixel-antialiased" x-data="videoFetcher()" x-init="fetchVideos()">
+  <template x-show="loading || allVideos === null" class="z-50">
+    <div id="loading-overlay" class="loading-overlay is-active is-full-page z-50">
+      <div class="loading-background"></div>
+      <div class="loading-icon"></div>
+    </div>
+  </template>
+
+  <template x-if="showMenu">
+    <div class="w-full flex">
+      <section class="h-50 p-8 absolute top-0 w-1/2 mx-auto">
+        <div class="container mx-auto py-8">
+          <input x-model="query" x-on:keyup="searchVideo()"
+            class="w-full h-16 px-3 rounded mb-8 focus:outline-none focus:shadow-outline text-xl px-8 shadow-lg z-50"
+            type="search" placeholder="Search...">
+        </div>
+      </section>
+    </div>
+  </template>
+  <section class="h-auto m-2 absolute right-0 flex items-center z-50 ">
+    <select
+      class="w-auto bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring"
+      x-model="currentVideoFile">
+      <template x-for="cr,index in currentResolutions" x-if="currentResolutions !== []">
+        <option :value="index" x-text="cr.quality + ' ' + cr.width + 'x' + cr.height">
+        </option>
+      </template>
+    </select>
+  </section>
+  <section class="h-auto m-2 absolute right-0 flex items-center z-50 mr-52">
+    <select x-model="perPage" x-on:change="fetchVideos()"
+      class="w-auto bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring">
+      <template x-for="pp in perPageAvailable">
+        <option :value="pp" x-text="pp">
+        </option>
+      </template>
+    </select>
+  </section>
+  <template x-if="!showMenu && showVideoNumber === -1">
+    <button @click="showMenuF()"
+      class="ml-6 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-white opacity-50 text-black max-w-max hover:bg-gray-200 rounded-full w-12 h-12 z-50">
+      <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
+        <path
+          d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
+          fill="currentColor"></path>
+      </svg>
+    </button>
+
+  </template>
+
+
+
+  <div class="w-full h-full select-none" id="videoContainer">
+    <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
+      <div class="w-full h-full">
+        <img :src="v['image']" alt="image" x-show="videoIndex === index && showVideoNumber === -1"
+          class="w-full h-full pointer-events-click" @click="setVideo(videoIndex)">
+        <template x-if="videoIndex === index && showVideoNumber !== -1" class="w-full h-full">
+          <iframe :src="v['video_files'][currentVideoFile]['link']" :width="v['video_files'][currentVideoFile]['width']"
+            class="absolute inset-0 w-full h-full" :height="v['video_files'][currentVideoFile]['height']"
+            allow="autoplay;fullscreen" allowfullscreen frameborder="0">
+          </iframe>
+        </template>
+      </div>
+    </template>
+    <a class="absolute h-32 my-auto left-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold"
+      x-show="videoIndex > 0">
+      <p @click="previousVideo()" class="bg-white align-middle px-4 rounded-full hover:text-gray-200">❮</p>
+    </a>
+    <a x-show="allVideos && videoIndex < allVideos.length -1"
+      class="absolute h-32 my-auto right-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold">
+      <p class="hover:text-gray-200 bg-white align-middle px-4 rounded-full" @click="nextVideo()">❯</p>
+    </a>
+  </div>
+
+</body>
+
+</html>
