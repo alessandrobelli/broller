@@ -55,6 +55,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "open": "^7.4.0",
     "pexels": "^1.0.1"
   },
   "devDependencies": {

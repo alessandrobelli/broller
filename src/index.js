@@ -11,19 +11,30 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     title: "broller",
     icon: path.join(app.getAppPath(), 'Broller.png'),
-    transparent: true,
     autoHideMenuBar: true,
     webPreferences: {
       worldSafeExecuteJavaScript: true,
       nodeIntegration: true
     }
   });
-
+  // Set Window Resizable
+  mainWindow.isResizable(true);
   mainWindow.setAspectRatio(16 / 9)
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-
+  mainWindow.focus();
 };
+
+
+app.on('web-contents-created', (e, contents) => {
+  contents.on('new-window', (e, url) => {
+    e.preventDefault();
+    require('open')(url);
+  });
+  contents.on('will-navigate', (e, url) => {
+    if (url !== contents.getURL()) e.preventDefault(), require('open')(url);
+  });
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

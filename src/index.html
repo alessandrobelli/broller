@@ -101,7 +101,7 @@
   </style>
 </head>
 
-<body class="w-full h-full font-serif subpixel-antialiased" x-data="videoFetcher()" x-init="fetchVideos()">
+<body class="w-full h-auto font-serif subpixel-antialiased bg-black" x-data="videoFetcher()" x-init="fetchVideos()">
   <template x-show="loading || allVideos === null" class="z-50">
     <div id="loading-overlay" class="loading-overlay is-active is-full-page z-50">
       <div class="loading-background"></div>
@@ -153,7 +153,7 @@
 
 
 
-  <div class="w-full h-full select-none" id="videoContainer">
+  <div class="w-full h-full select-none overflow-hidden" id="videoContainer">
     <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
       <div class="w-full h-full">
         <img :src="v['image']" alt="image" x-show="videoIndex === index && showVideoNumber === -1"
@@ -163,9 +163,19 @@
             class="absolute inset-0 w-full h-full" :height="v['video_files'][currentVideoFile]['height']"
             allow="autoplay;fullscreen" allowfullscreen frameborder="0">
           </iframe>
+          <p x-show="videoIndex === index && showVideoNumber !== -1"
+            class="absolute bottom-0 right-0 text-white mr-2 z-50">This <a :href="v['url']"
+              class="text-green-300">Video</a> was shot by <a :href="v['user']['url']" x-text="v['user']['name']"
+              class="text-green-300"></a> on Pexels.
+          </p>
         </template>
+        <a x-show="videoIndex === index && showVideoNumber === -1"
+          class="absolute bottom-0 right-0 text-white mr-2 z-25 mb-4" href="https://www.pexels.com">Videos provided by
+          <span class="text-green-300">Pexels</span></a>
       </div>
+
     </template>
+
     <a class="absolute h-32 my-auto left-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold"
       x-show="videoIndex > 0">
       <p @click="previousVideo()" class="bg-white align-middle px-4 rounded-full hover:text-gray-200">❮</p>
