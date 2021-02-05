@@ -102,19 +102,23 @@
 </head>
 
 <body class="w-full h-auto font-serif subpixel-antialiased bg-black" x-data="videoFetcher()" x-init="fetchVideos()">
-  <template x-show="loading || allVideos === null" class="z-50">
-    <div id="loading-overlay" class="loading-overlay is-active is-full-page z-50">
-      <div class="loading-background"></div>
-      <div class="loading-icon"></div>
-    </div>
-  </template>
 
+  <template x-if="!showMenu && showVideoNumber === -1">
+    <button @click="showMenuF()"
+      class="ml-6 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-green-300 opacity-50 text-black max-w-max hover:bg-green-600 rounded-full w-12 h-12 z-50">
+      <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
+        <path
+          d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
+          fill="currentColor"></path>
+      </svg>
+    </button>
+  </template>
   <template x-if="showMenu">
     <div class="w-full flex">
-      <section class="h-50 p-8 absolute top-0 w-1/2 mx-auto">
+      <section class="h-36 p-8 absolute top-0 w-1/3 mx-auto">
         <div class="container mx-auto py-8">
-          <input x-model="query" x-on:keyup="searchVideo()"
-            class="w-full h-16 px-3 rounded mb-8 focus:outline-none focus:shadow-outline text-xl px-8 shadow-lg z-50"
+          <input autofocus x-model="query" x-on:keyup="searchVideo()"
+            class="w-full h-12 px-3 rounded mb-8 focus:outline-none focus:shadow-outline text-xl px-8 shadow-lg z-50"
             type="search" placeholder="Search...">
         </div>
       </section>
@@ -122,7 +126,7 @@
   </template>
   <section class="h-auto m-2 absolute right-0 flex items-center z-50 ">
     <select
-      class="w-auto bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring"
+      class="w-auto bg-green-300 border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring"
       x-model="currentVideoFile">
       <template x-for="cr,index in currentResolutions" x-if="currentResolutions !== []">
         <option :value="index" x-text="cr.quality + ' ' + cr.width + 'x' + cr.height">
@@ -132,30 +136,19 @@
   </section>
   <section class="h-auto m-2 absolute right-0 flex items-center z-50 mr-52">
     <select x-model="perPage" x-on:change="fetchVideos()"
-      class="w-auto bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring">
-      <template x-for="pp in perPageAvailable">
-        <option :value="pp" x-text="pp">
+      class="w-auto bg-green-300 border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring">
+      <template x-for="howMany in perPageAvailable">
+        <option :value="howMany" x-text="howMany">
         </option>
       </template>
     </select>
   </section>
-  <template x-if="!showMenu && showVideoNumber === -1">
-    <button @click="showMenuF()"
-      class="ml-6 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-white opacity-50 text-black max-w-max hover:bg-gray-200 rounded-full w-12 h-12 z-50">
-      <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
-        <path
-          d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
-          fill="currentColor"></path>
-      </svg>
-    </button>
-
-  </template>
 
 
 
-  <div class="w-full h-full select-none overflow-hidden" id="videoContainer">
+  <div class="w-full h-full select-none" id="videoContainer">
     <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
-      <div class="w-full h-full">
+      <div>
         <img :src="v['image']" alt="image" x-show="videoIndex === index && showVideoNumber === -1"
           class="w-full h-full pointer-events-click" @click="setVideo(videoIndex)">
         <template x-if="videoIndex === index && showVideoNumber !== -1" class="w-full h-full">
@@ -178,11 +171,11 @@
 
     <a class="absolute h-32 my-auto left-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold"
       x-show="videoIndex > 0">
-      <p @click="previousVideo()" class="bg-white align-middle px-4 rounded-full hover:text-gray-200">❮</p>
+      <p @click="previousVideo()" class="bg-green-300 align-middle px-4 rounded-full hover:text-gray-200">❮</p>
     </a>
     <a x-show="allVideos && videoIndex < allVideos.length -1"
       class="absolute h-32 my-auto right-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold">
-      <p class="hover:text-gray-200 bg-white align-middle px-4 rounded-full" @click="nextVideo()">❯</p>
+      <p class="hover:text-gray-200 bg-green-300 align-middle px-4 rounded-full" @click="nextVideo()">❯</p>
     </a>
   </div>
 
