@@ -1,7 +1,7 @@
 # BRoller
 BRoller is an application that allows to search for BRolls directly from your computer!
 
-📽️ `Video coming soon!`
+📽️ https://www.youtube.com/watch?v=AWpCRvFOabc
 
 ## Start developing
 Navigate into broller folder with your terminal, type `npm install`.
