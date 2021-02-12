@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="tailwind.css">
   <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"></script>
   <script type="text/javascript" src="render.js"></script>
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' cdn.jsdelivr.net 'unsafe-eval';">
   <style>
     ::-webkit-scrollbar {
       display: none;
@@ -101,7 +102,8 @@
   </style>
 </head>
 
-<body class="w-full h-auto font-serif subpixel-antialiased bg-black" x-data="videoFetcher()" x-init="fetchVideos()">
+<body class="w-full h-auto font-serif subpixel-antialiased bg-black" x-data="videoFetcher()" x-init="fetchVideos()"
+  x-on:gotVideos="assignVideos(data)">
 
   <template x-if="!showMenu && showVideoNumber === -1">
     <button @click="showMenuF()"
