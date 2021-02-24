@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { createClient } = require('pexels');
-const client = createClient('***REMOVED***');
+const client = createClient('563492ad6f917000010000019b8507e0a750483fb3b57aca17d48742');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require

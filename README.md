@@ -4,7 +4,10 @@ BRoller is an application that allows to search for BRolls directly from your co
 📽️ https://www.youtube.com/watch?v=AWpCRvFOabc
 
 ## Start developing
-Navigate into broller folder with your terminal, type `npm install`.
+- Navigate into broller folder with your terminal, type `npm install`.
+- Remove '.copy' from .env.copy.
+- Then you need to go to [Pexels API website](https://www.pexels.com/api/) to get an API key and paste it in the .env file.
+
 Afterwards type `npm run start` to debug the app.
 To get an executable run `npm run make`. You can't make a macOS executable on Windows.
 
