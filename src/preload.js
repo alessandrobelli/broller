@@ -1,13 +1,17 @@
 const {
   contextBridge,
-  ipcRenderer
+  ipcRenderer,
+  remote
 } = require("electron");
 require('dotenv').config()
 
 const { createClient } = require('pexels');
 const client = createClient(process.env.API_KEY);
-
-
+ipcRenderer.on('preferencesUpdated', (e, preferences) => {
+  console.log(preferences.settings.visualization);
+  console.log(preferences);
+  ipcRenderer.send("syncToAlpine", preferences.settings.visualization)
+});
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld(
@@ -30,12 +34,21 @@ contextBridge.exposeInMainWorld(
           ipcRenderer.send(channel, data);
         });
       }
+    }
+    console.log(channel);
 
+    if (channel === "toShowPrefs") {
+      ipcRenderer.send('showPreferences');
+    } else if (channel === "syncPreferences") {
+      const preferences = ipcRenderer.sendSync('getPreferences');
+      console.log(preferences.settings.visualization)
+      ipcRenderer.send("syncToAlpine", preferences.settings.visualization)
 
     }
+
   },
   receive: (channel, func) => {
-    let validChannels = ["fromSearch", "fromShowMenu", "fromPopular"];
+    let validChannels = ["fromSearch", "fromShowMenu", "fromPopular", "fromSyncToAlpine"];
     if (validChannels.includes(channel)) {
       // Deliberately strip event as it includes `sender` 
       ipcRenderer.on(channel, (event, ...args) => func(...args));

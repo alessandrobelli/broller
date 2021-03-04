@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const { createClient } = require('pexels');
-const client = createClient('563492ad6f917000010000019b8507e0a750483fb3b57aca17d48742');
+const os = require('os');
+const ElectronPreferences = require('electron-preferences');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -29,8 +29,66 @@ const createWindow = async () => {
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.focus();
+
 };
 
+
+const preferences = new ElectronPreferences({
+  /**
+   * Where should preferences be saved?
+   */
+  'dataStore': path.resolve(app.getPath('userData'), 'preferences.json'),
+  /**
+   * Default values.
+   */
+  'defaults': {
+    'notes': {
+      'folder': path.resolve(os.homedir(), 'Notes')
+    },
+    'markdown': {
+      'auto_format_links': true,
+      'show_gutter': false
+    },
+    'preview': {
+      'show': true
+    },
+    'drawer': {
+      'show': false
+    }
+  },
+  /**
+   * The preferences window is divided into sections. Each section has a label, an icon, and one or
+   * more fields associated with it. Each section should also be given a unique ID.
+   */
+  'sections': [
+    {
+      'id': 'settings',
+      'label': 'Settings',
+      /**
+       * See the list of available icons below.
+       */
+      'icon': 'settings-gear-63',
+      'form': {
+        'groups': [
+          {
+            'label': 'Visual Settings',
+            'fields': [
+              {
+                'label': 'Which window you would like to use?',
+                'key': 'visualization',
+                'type': 'radio',
+                'options': [
+                  { 'label': 'Big Images', 'value': 'bigimages' },
+                  { 'label': 'List', 'value': 'list' },],
+                'help': 'Do I need this?'
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+});
 
 app.on('web-contents-created', (e, contents) => {
   contents.on('new-window', (e, url) => {
@@ -64,9 +122,9 @@ app.on('activate', () => {
   }
 });
 
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-
 ipcMain.on("toPopular", (event, args) => {
   // Do something with file contents
   // Send result back to renderer process
@@ -81,4 +139,10 @@ ipcMain.on("toSearch", (event, args) => {
   // Do something with file contents
   // Send result back to renderer process
   mainWindow.webContents.send("fromSearch", args);
+});
+
+ipcMain.on("syncToAlpine", (event, args) => {
+  // Do something with file contents
+  // Send result back to renderer process
+  mainWindow.webContents.send("fromSyncToAlpine", args);
 });

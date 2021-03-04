@@ -104,10 +104,18 @@
 
 <body class="w-full h-auto font-serif subpixel-antialiased bg-black" x-data="videoFetcher()" x-init="fetchVideos()"
   x-on:gotVideos="assignVideos(data)">
-
   <template x-if="!showMenu && showVideoNumber === -1">
     <button @click="showMenuF()"
       class="ml-6 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-green-300 opacity-50 text-black max-w-max hover:bg-green-600 rounded-full w-12 h-12 z-50">
+      <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
+        <path
+          d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
+          fill="currentColor"></path>
+
+      </svg>
+    </button>
+    <button @click="showPreferences()"
+      class="ml-24 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-green-300 opacity-50 text-black max-w-max hover:bg-green-600 rounded-full w-12 h-12 z-50">
       <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
         <path
           d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
@@ -147,40 +155,55 @@
   </section>
 
 
+  <template x-if="visualization === 'bigimages'">
+    <div class="w-full h-full select-none" id="videoContainer">
+      <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
+        <div>
+          <img :src="v['image']" alt="image" x-show="videoIndex === index && showVideoNumber === -1"
+            class="w-full h-full pointer-events-click" @click="setVideo(videoIndex)">
+          <template x-if="videoIndex === index && showVideoNumber !== -1" class="w-full h-full">
+            <iframe :src="v['video_files'][currentVideoFile]['link']"
+              :width="v['video_files'][currentVideoFile]['width']" class="absolute inset-0 w-full h-full"
+              :height="v['video_files'][currentVideoFile]['height']" allow="autoplay;fullscreen" allowfullscreen
+              frameborder="0">
+            </iframe>
+            <p x-show="videoIndex === index && showVideoNumber !== -1"
+              class="absolute bottom-0 right-0 text-white mr-2 z-50">This <a :href="v['url']"
+                class="text-green-300">Video</a> was shot by <a :href="v['user']['url']" x-text="v['user']['name']"
+                class="text-green-300"></a> on Pexels.
+            </p>
+          </template>
+          <a x-show="videoIndex === index && showVideoNumber === -1"
+            class="absolute bottom-0 right-0 text-white mr-2 z-25 mb-4" href="https://www.pexels.com">Videos provided by
+            <span class="text-green-300">Pexels</span></a>
+        </div>
 
-  <div class="w-full h-full select-none" id="videoContainer">
-    <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
-      <div>
-        <img :src="v['image']" alt="image" x-show="videoIndex === index && showVideoNumber === -1"
-          class="w-full h-full pointer-events-click" @click="setVideo(videoIndex)">
-        <template x-if="videoIndex === index && showVideoNumber !== -1" class="w-full h-full">
-          <iframe :src="v['video_files'][currentVideoFile]['link']" :width="v['video_files'][currentVideoFile]['width']"
-            class="absolute inset-0 w-full h-full" :height="v['video_files'][currentVideoFile]['height']"
-            allow="autoplay;fullscreen" allowfullscreen frameborder="0">
-          </iframe>
-          <p x-show="videoIndex === index && showVideoNumber !== -1"
-            class="absolute bottom-0 right-0 text-white mr-2 z-50">This <a :href="v['url']"
-              class="text-green-300">Video</a> was shot by <a :href="v['user']['url']" x-text="v['user']['name']"
-              class="text-green-300"></a> on Pexels.
+      </template>
+
+      <a class="absolute h-32 my-auto left-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold"
+        x-show="videoIndex > 0">
+        <p @click="previousVideo()" class="bg-green-300 align-middle px-4 rounded-full hover:text-gray-200">❮</p>
+      </a>
+      <a x-show="allVideos && videoIndex < allVideos.length -1"
+        class="absolute h-32 my-auto right-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold">
+        <p class="hover:text-gray-200 bg-green-300 align-middle px-4 rounded-full" @click="nextVideo()">❯</p>
+      </a>
+    </div>
+  </template>
+
+  <template x-if="visualization === 'list'">
+    <div class="w-full h-full select-none" id="videoContainer">
+      <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
+        <div class="h-1/6 w-full">
+          <img :src="v['image']" alt="image" class="w-32 h-full m-0 inline-flex">
+          <p class="inline-flex text-white mr-2 z-50">This&nbsp;<a :href="v['url']"
+              class="text-green-300">Video</a>&nbsp;was shot
+            by&nbsp;<a :href="v['user']['url']" x-text="v['user']['name']" class="text-green-300"></a>&nbsp;on Pexels.
           </p>
-        </template>
-        <a x-show="videoIndex === index && showVideoNumber === -1"
-          class="absolute bottom-0 right-0 text-white mr-2 z-25 mb-4" href="https://www.pexels.com">Videos provided by
-          <span class="text-green-300">Pexels</span></a>
-      </div>
-
-    </template>
-
-    <a class="absolute h-32 my-auto left-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold"
-      x-show="videoIndex > 0">
-      <p @click="previousVideo()" class="bg-green-300 align-middle px-4 rounded-full hover:text-gray-200">❮</p>
-    </a>
-    <a x-show="allVideos && videoIndex < allVideos.length -1"
-      class="absolute h-32 my-auto right-0 inset-y-0 flex items-center p-4 select-none text-black text-3xl font-extrabold">
-      <p class="hover:text-gray-200 bg-green-300 align-middle px-4 rounded-full" @click="nextVideo()">❯</p>
-    </a>
-  </div>
-
+        </div>
+      </template>
+    </div>
+  </template>
 </body>
 
 </html>
