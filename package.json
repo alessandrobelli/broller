@@ -54,8 +54,9 @@
     }
   },
   "dependencies": {
+    "alpinejs": "^2.8.2",
     "dotenv": "^8.2.0",
-    "electron-preferences": "^2.1.0",
+    "electron-preferences": "^2.3.0",
     "electron-squirrel-startup": "^1.0.0",
     "open": "^7.4.0",
     "pexels": "^1.0.1"

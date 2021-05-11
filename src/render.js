@@ -9,8 +9,7 @@ const videoFetcher = function videoFetcher() {
         showMenu: false,
         visualization: window.visualization,
         menuInterval: null,
-        perPage: 10,
-        perPageAvailable: [10, 25, 50, 100],
+        perPage: 1,
         currentResolutions: [],
         currentVideoFile: 0,
         showPreferences() {
@@ -18,21 +17,20 @@ const videoFetcher = function videoFetcher() {
             window.api.send("toShowPrefs");
         },
         showMenuF() {
-            const perPage = this.perPage;
+
             this.showMenu = true;
             let self = this;
             if (this.menuInterval != null) clearInterval(this.menuInterval);
             this.menuInterval = setInterval(function () {
                 if (self.query === "" && self.showMenu) {
-                    window.api.send("toShowMenu", perPage);
+                    window.api.send("toShowMenu");
                 }
             }, 5000);
         },
         fetchVideos() {
-            const perPage = this.perPage;
-            window.api.send("toPopular", perPage);
+            window.api.send("toPopular");
             window.api.send("syncPreferences");
-            if (this.perPage < this.videoIndex) this.videoIndex = this.perPage - 1;
+            
 
             if (this.query !== "") {
                 this.searchVideo();
@@ -49,14 +47,36 @@ const videoFetcher = function videoFetcher() {
                 this.currentResolutions = this.allVideos[this.videoIndex]['video_files'];
                 this.showMenu = false;
             });
+            
             window.api.receive("fromPopular", (data) => {
                 this.allVideos = data
                 this.currentResolutions = this.allVideos[this.videoIndex]['video_files'];
             });
-            window.api.receive("fromSyncToAlpine", (data) => {
-
+            window.api.receive("fromVisualSyncToAlpine", (data) => {
+                console.log("---------------------------------------------")
+                console.log(data);
+                console.log("---------------------------------------------")
                 this.visualization = data;
             });
+            window.api.receive("fromPerPageSyncToAlpine", (data) => {
+                this.perPage = data;
+                if (this.perPage < this.videoIndex) this.videoIndex = this.perPage - 1;
+
+                console.log("fetching "+this.perPage+" videos")
+                this.onlyGetVideos();
+            });
+        },
+        openVideo(url){
+            console.log("on openVideo")
+            window.api.send("openWindow",url)
+        },
+        onlyGetVideos(){
+            if (this.query !== "") {
+                this.searchVideo();
+                return
+            }
+
+            window.api.send("toPopular");
         },
         setVideo(videoIndex) {
             this.showVideoNumber = videoIndex
@@ -65,10 +85,7 @@ const videoFetcher = function videoFetcher() {
 
             this.loading = true;
             const query = this.query;
-            const perPage = this.perPage;
-            window.api.send("toSearch", perPage, query);
-
-
+            window.api.send("toSearch", query);
 
         },
         previousVideo() {

@@ -3,12 +3,14 @@ const path = require('path');
 const os = require('os');
 const ElectronPreferences = require('electron-preferences');
 
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
 }
 
 let mainWindow;
+let childWindow;
 
 const createWindow = async () => {
   // Create the browser window.
@@ -17,6 +19,7 @@ const createWindow = async () => {
     icon: path.join(app.getAppPath(), 'Broller.png'),
     autoHideMenuBar: true,
     webPreferences: {
+      nativeWindowOpen: true,
       nodeIntegration: false, // is default value after Electron v5
       contextIsolation: true, // protect against prototype pollution
       enableRemoteModule: false, // turn off remote
@@ -30,6 +33,7 @@ const createWindow = async () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.focus();
 
+  
 };
 
 
@@ -80,8 +84,20 @@ const preferences = new ElectronPreferences({
                 'options': [
                   { 'label': 'Big Images', 'value': 'bigimages' },
                   { 'label': 'List', 'value': 'list' },],
-                'help': 'Do I need this?'
-              }
+                'help': 'Reload on select.'
+              },
+              {
+                'label': 'Videos per Page',
+                'key': 'perPage',
+                'type': 'dropdown',
+                'options': [
+                  { 'label': 10, 'value': 10 },
+                  { 'label': 25, 'value': 25 },
+                  { 'label': 50, 'value': 50 },
+                  { 'label': 100, 'value': 100 },
+                ],
+                'help': 'Select how many videos you want to load at once.'
+              },
             ]
           }
         ]
@@ -141,8 +157,52 @@ ipcMain.on("toSearch", (event, args) => {
   mainWindow.webContents.send("fromSearch", args);
 });
 
-ipcMain.on("syncToAlpine", (event, args) => {
+ipcMain.on("VisualSyncToAlpine", (event, args) => {
   // Do something with file contents
   // Send result back to renderer process
-  mainWindow.webContents.send("fromSyncToAlpine", args);
+  mainWindow.webContents.send("fromVisualSyncToAlpine", args);
+});
+
+ipcMain.on("PerPageSyncToAlpine", (event, args) => {
+  // Do something with file contents
+  // Send result back to renderer process
+  mainWindow.webContents.send("fromPerPageSyncToAlpine", args);
+});
+
+ipcMain.on("openWindow", (event, args) => {
+
+  if(childWindow === undefined)
+  {
+  childWindow = new BrowserWindow({
+    title: "VIDEO",
+    icon: path.join(app.getAppPath(), 'Broller.png'),
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
+      preload: path.join(__dirname, "preload.js") // use a preload script
+    }
+  });
+    // set to undefined
+    childWindow.on('close', () => {
+      childWindow = undefined;
+    });
+
+    // set to undefined
+    childWindow.on('closed', () => {
+      childWindow = undefined;
+    });
+
+
+  // Set Window Resizable
+  childWindow.isResizable(true);
+  childWindow.setAspectRatio(16 / 9)
+  // and load the index.html of the app.
+    childWindow.focus();
+  childWindow.loadURL(args);
+  }else{
+    childWindow.focus();
+    childWindow.loadURL(args);
+  }
 });

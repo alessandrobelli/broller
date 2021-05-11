@@ -116,10 +116,9 @@
     </button>
     <button @click="showPreferences()"
       class="ml-24 mt-6 absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-green-300 opacity-50 text-black max-w-max hover:bg-green-600 rounded-full w-12 h-12 z-50">
-      <svg width="32" height="32" viewBox="0 0 32 32" style="transform: rotate(360deg);">
-        <path
-          d="M29 27.586l-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29zM4 13a9 9 0 1 1 9 9a9.01 9.01 0 0 1-9-9z"
-          fill="currentColor"></path>
+      <svg width="26" height="24" viewBox="0 0 30 26">
+        <path fill="currentColor"
+          d="M29 13.616v-3.232c-1.651-.587-2.694-.752-3.219-2.019v-.001c-.527-1.271.1-2.134.847-3.707l-2.285-2.285c-1.561.742-2.433 1.375-3.707.847h-.001c-1.269-.526-1.435-1.576-2.019-3.219h-3.232c-.582 1.635-.749 2.692-2.019 3.219h-.001c-1.271.528-2.132-.098-3.707-.847l-2.285 2.285c.745 1.568 1.375 2.434.847 3.707-.527 1.271-1.584 1.438-3.219 2.02v3.232c1.632.58 2.692.749 3.219 2.019.53 1.282-.114 2.166-.847 3.707l2.285 2.286c1.562-.743 2.434-1.375 3.707-.847h.001c1.27.526 1.436 1.579 2.019 3.219h3.232c.582-1.636.75-2.69 2.027-3.222h.001c1.262-.524 2.12.101 3.698.851l2.285-2.286c-.744-1.563-1.375-2.433-.848-3.706.527-1.271 1.588-1.44 3.221-2.021zm-12 2.384c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z" />
       </svg>
     </button>
   </template>
@@ -140,15 +139,6 @@
       x-model="currentVideoFile">
       <template x-for="cr,index in currentResolutions" x-if="currentResolutions !== []">
         <option :value="index" x-text="cr.quality + ' ' + cr.width + 'x' + cr.height">
-        </option>
-      </template>
-    </select>
-  </section>
-  <section class="h-auto m-2 absolute right-0 flex items-center z-50 mr-52">
-    <select x-model="perPage" x-on:change="fetchVideos()"
-      class="w-auto bg-green-300 border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:ring">
-      <template x-for="howMany in perPageAvailable">
-        <option :value="howMany" x-text="howMany">
         </option>
       </template>
     </select>
@@ -176,6 +166,10 @@
           <a x-show="videoIndex === index && showVideoNumber === -1"
             class="absolute bottom-0 right-0 text-white mr-2 z-25 mb-4" href="https://www.pexels.com">Videos provided by
             <span class="text-green-300">Pexels</span></a>
+            <a 
+              class="absolute uppercase p-3 focus:none outline-none outline-none flex items-center bg-green-300 text-black max-w-max hover:bg-green-600 z-25">
+              Download
+        </a>
         </div>
 
       </template>
@@ -194,12 +188,14 @@
   <template x-if="visualization === 'list'">
     <div class="w-full h-full select-none" id="videoContainer">
       <template x-for="(v, index) in allVideos" :key="index" x-if="allVideos">
-        <div class="h-1/6 w-full">
-          <img :src="v['image']" alt="image" class="w-32 h-full m-0 inline-flex">
-          <p class="inline-flex text-white mr-2 z-50">This&nbsp;<a :href="v['url']"
-              class="text-green-300">Video</a>&nbsp;was shot
+        <div class="h-1/6 transform duration-500 origin-left ease-in-out hover:scale-150 z-25 hover:h-full">
+          <img :src="v['image']" @click="openVideo(v['video_files'][currentVideoFile]['link'])" alt="image" 
+          class="w-32 h-auto inline-flex">
+          <p class="inline-flex text-white">This&nbsp;<a :href="v['url']"
+               class="text-green-300">Video</a>&nbsp;was shot
             by&nbsp;<a :href="v['user']['url']" x-text="v['user']['name']" class="text-green-300"></a>&nbsp;on Pexels.
           </p>
+
         </div>
       </template>
     </div>
