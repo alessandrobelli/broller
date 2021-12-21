@@ -17,7 +17,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security
 
-If you discover any security related issues, please email info@alessandrobelli.it instead of using the issue tracker.
+If you discover any security related issues, please email alessandrobelli90@gmail.com instead of using the issue tracker.
 
 ## Credits
 
